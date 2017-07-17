@@ -2,8 +2,8 @@
  * Demonstration of how to write unit tests for dominion-base
  * Include the following lines in your makefile:
  *
- * unittest2: unittest2.c dominion.o rngs.o
- *      gcc -o unittest2 -g  unittest2.c dominion.o rngs.o $(CFLAGS)
+ * cardtest1: cardtest2.c dominion.o rngs.o
+ *      gcc -o cardtest2 -g  cardtest2.c dominion.o rngs.o $(CFLAGS)
  * -----------------------------------------------------------------------
  */
 
@@ -14,199 +14,93 @@
 #include <assert.h>
 #include "rngs.h"
 
- // set NOISY_TEST to 0 to remove printfs from output
+// set NOISY_TEST to 0 to remove printfs from output
 #define NOISY_TEST 1
 
 int main() {
-	int i;
-	int j;
+    int i;
 
-	int curseFlag = 0;
-	int provinceFlag = 0;
-	int treasureFlag = 0;
-	int nonsenseFlag = 0;
-	int bugFlag = 0;
-	int duplicateFlag = 0;
-	int testFlag = 0;
+    // array of all cards
+    int hand[5] = {adventurer, smithy, village, great_hall, treasure_map};
 
-	int* randArray1 = malloc(10 * sizeof(int));
-	int* randArray2 = malloc(10 * sizeof(int));
-	int* randArray3 = malloc(10 * sizeof(int));
-	int* randArray4 = malloc(10 * sizeof(int));
+    int seed = 1000;
+    int numPlayer = 2;
+    int r, handCount;
+    int k[10] = { adventurer, council_room, feast, gardens, mine
+	    , remodel, smithy, village, baron, great_hall };
+    struct gameState Before;
+    struct gameState After;
 
-	int* usedNumbs = malloc(5 * sizeof(int));
+    int sameFlag = 0;
+    int differentFlag = 0;
 
-	int* arrayReturned1 = malloc(10 * sizeof(int));
-	int* arrayReturned2 = malloc(10 * sizeof(int));
-	int* arrayReturned3 = malloc(10 * sizeof(int));
-	int* arrayReturned4 = malloc(10 * sizeof(int));
-
-
-	for (i = 0; i < 10; i++) {
-		randArray1[i] = i;
-	}
-
-	for (i = 0; i < 10; i++) {
-		randArray2[i] = i + 10;
-	}
-
-	for (i = 0; i < 10; i++) {
-		randArray3[i] = (i + 20) % 27;
-	}
-
-	for (i = 0; i < 10; i++) {
-		randArray4[i] = i % 5;
-	}
-
-	printf("TESTING kingdomCards():\n");
+    printf("TESTING greatHallFunction():\n");
 
 #if (NOISY_TEST == 1)
-	printf("Test if KingdomCards() Only Accepts Valid Cards\n");
+	    printf("Test Current Player Should Recieve Exactly 1 Card\n");
 #endif
-	arrayReturned1 = kingdomCards(randArray1[0], randArray1[1], randArray1[2], randArray1[3], randArray1[4], randArray1[5], randArray1[6], randArray1[7], randArray1[8], randArray1[9]);
-	for (i = 0; i < 10; i++) {
-		if (arrayReturned1[i] == 0) {
-			curseFlag = 1;
-		}
-		else if (arrayReturned1[i] > 0 && arrayReturned1[i] < 4) {
-			provinceFlag = 1;
-		}
+	    memset(&Before, 23, sizeof(struct gameState));   // clear the game states
+	    memset(&After, 23, sizeof(struct gameState));   // clear the game states
+	    r = initializeGame(numPlayer, k, seed, &Before); // initialize a new game
+	    r = initializeGame(numPlayer, k, seed, &After); // initialize a new game
+	    for (i = 0; i < 5; i++) {
+		    Before.hand[0][i] = hand[i];
+		    After.hand[0][i] = hand[i];
+	    }
+	    
+	   
+	    After.handCount[0] = handCount;                 // set the number of cards on hand
+	    Before.handCount[0] = handCount;
 
-		else if (arrayReturned1[i] > 4 && arrayReturned1[i] < 7) {
-			treasureFlag = 1;
-		}
+	    greatHallFunction(&After, 3);
 
-		else if (arrayReturned1[i] > 0 || arrayReturned1[i] < 26) {
-			nonsenseFlag = 1;
-		}
-	}
+	    if (Before.handCount[0] != After.handCount[0]) {
+		    printf("BUG: Card count off!\n");
+		    sameFlag += 1;
+	    }
+	    
+	      
+#if (NOISY_TEST == 1)
+    printf("1 Cards Should Be Taken From Player's Pile\n");
+#endif
+    if (Before.deckCount[0] != After.deckCount[0] + 1) {
+	    printf("BUG: Deck count off!\n");
+	    sameFlag += 1;
+    }
 
-	if (curseFlag == 1) {
-		bugFlag = 1;
-		printf("BUG: KingdomCards() accepts Curse Cards\n");
-	}
-
-	if (provinceFlag == 1) {
-		bugFlag = 1;
-		printf("BUG: KingdomCards() accepts Territory Cards\n");
-	}
-
-	if (treasureFlag == 1) {
-		bugFlag = 1;
-		printf("BUG: KingdomCards() accepts Treasure Cards\n");
-	}
-
-	if (curseFlag == 1) {
-		bugFlag = 1;
-		printf("BUG: KingdomCards() accepts Curse Cards\n");
-	}
-
-	if (bugFlag == 0) {
-		printf("Input Test Passed - KingdomCards() Only Accepts Valid Input\n");
-	}
-
-	else if (bugFlag == 1) {
-		testFlag == 1;
-	}
-
-	bugFlag = 0;		// Reset Bug Flag
 
 #if (NOISY_TEST == 1)
-	printf("Test if KingdomCards() Places Cards At Correct Location\n");
+    printf("No State Change in Opponent.\n", 28, -1);
 #endif
-	arrayReturned1 = kingdomCards(randArray1[0], randArray1[1], randArray1[2], randArray1[3], randArray1[4], randArray1[5], randArray1[6], randArray1[7], randArray1[8], randArray1[9]);
-	arrayReturned2 = kingdomCards(randArray2[0], randArray2[1], randArray2[2], randArray2[3], randArray2[4], randArray2[5], randArray2[6], randArray2[7], randArray2[8], randArray2[9]);
-	arrayReturned3 = kingdomCards(randArray3[0], randArray3[1], randArray3[2], randArray3[3], randArray3[4], randArray3[5], randArray3[6], randArray3[7], randArray3[8], randArray3[9]);
-	for (i = 0; i < 10; i++) {
-		if (arrayReturned1[i] != randArray1[i]) {
-			bugFlag = 1;
-		}
-
-		if (arrayReturned2[i] != randArray2[i]) {
-			bugFlag = 1;
-		}
-
-		if (arrayReturned3[i] != randArray3[i]) {
-			bugFlag = 1;
-		}
-	}
-
-	if (bugFlag == 0) {
-		printf("Input Test Passed - KingdomCards() Places Cards At Correct Locations\n");
-	}
-
-	else if (bugFlag == 1) {
-		testFlag = 1;
-	}
-
-	bugFlag = 0;
+    for (i = 0; i < 5; i++) {
+	    assert(Before.hand[1][i] == After.hand[1][i]);
+	    assert(Before.handCount[1] == After.handCount[1]);
+    }
+    
 
 #if (NOISY_TEST == 1)
-	printf("Test if KingdomCards() Accepts Duplicate Cards\n");
+    printf("No State Change to Victory Cards or Kingdom Cards.\n");
 #endif
-	arrayReturned4 = kingdomCards(randArray4[0], randArray4[1], randArray4[2], randArray4[3], randArray4[4], randArray4[5], randArray4[6], randArray4[7], randArray4[8], randArray4[9]);
-	for (i = 0; i < 10; i++) {
-		duplicateFlag = 0;
-		for (j = 0; j < 5; j++) {
-			if (arrayReturned4[i] == usedNumbs[j]) {
-				duplicateFlag = 1;
-			}
-		}
-
-		if (duplicateFlag = 1) {
-			bugFlag = 1;
-		}
-
-		if (duplicateFlag == 0) {
-			usedNumbs[i % 5] = arrayReturned4[i];
-		}
-	}
-
-	if (bugFlag == 0) {
-		printf("Input Test Passed - KingdomCards() Does Not Accept Duplicate Cards\n");
-	}
-
-	else if (bugFlag == 1) {
-		testFlag = 1;
-		printf("BUG: KingdomCards() Accepts Duplicate Cards\n");
-	}
-
-	bugFlag = 0;
+    for (i = 0; i < 27; i++) {
+	    assert(Before.supplyCount[i] == After.supplyCount[i]);
+    }
 
 #if (NOISY_TEST == 1)
-	printf("Test if KingdomCards() Returns Correct Array\n");
+    printf("HandCount Should Remain The Same.\n");
 #endif
-	arrayReturned1 = kingdomCards(randArray1[0], randArray1[1], randArray1[2], randArray1[3], randArray1[4], randArray1[5], randArray1[6], randArray1[7], randArray1[8], randArray1[9]);
-	arrayReturned2 = kingdomCards(randArray2[0], randArray2[1], randArray2[2], randArray2[3], randArray2[4], randArray2[5], randArray2[6], randArray2[7], randArray2[8], randArray2[9]);
-	arrayReturned3 = kingdomCards(randArray3[0], randArray3[1], randArray3[2], randArray3[3], randArray3[4], randArray3[5], randArray3[6], randArray3[7], randArray3[8], randArray3[9]);
-	for (i = 0; i < 10; i++) {
-		if (arrayReturned1[i] != randArray1[i]) {
-			bugFlag = 1;
-		}
+    
+    if (Before.handCount[0] != After.handCount[0]) {
+	    printf("BUG: Hand count off!\n");
+	    sameFlag += 1;
+    }
 
-		if (arrayReturned2[i] != randArray2[i]) {
-			bugFlag = 1;
-		}
+    if (sameFlag == 0) {
+	    printf("All tests passed!\n");
+    }
+    else {
+	    printf("BUGS FOUND!\n");
+    }
+    
 
-		if (arrayReturned3[i] != randArray3[i]) {
-			bugFlag = 1;
-		}
-	}
-
-	if (bugFlag == 0) {
-		printf("Input Test Passed - KingdomCards() Places Cards At Correct Locations\n");
-	}
-
-	else if (bugFlag == 1) {
-		printf("BUG: KingdomCards() Returns Incorrect Array\n");
-	}
-
-	if (testFlag == 0) {
-		printf("All tests passed!\n");
-		return 0;
-	}
-	else if (testFlag == 1) {
-		printf("BUG: SOME TESTS FAILED!\n");
-		return -1;
-	}
+    return 0;
 }

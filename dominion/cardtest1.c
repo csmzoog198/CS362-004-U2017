@@ -56,17 +56,15 @@ int main() {
 
 	    if (Before.handCount[0] != After.handCount[0] - 2) {
 		    printf("BUG: Card count off!\n");
-		    sameFlag = 1;
-	    }
-
-	    sameFlag = 0;	    
+		    sameFlag += 1;
+	    }	    
 	      
 #if (NOISY_TEST == 1)
     printf("3 Cards Should Be Taken From Player's Pile\n");
 #endif
     if (Before.deckCount[0] != After.deckCount[0] + 3) {
-	    printf("BUG: Card count off!\n");
-	    sameFlag = 1;
+	    printf("BUG: Deck count off!\n");
+	    sameFlag += 1;
     }
 
 
