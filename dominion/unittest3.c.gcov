@@ -1,0 +1,87 @@
+        -:    0:Source:unittest3.c
+        -:    0:Graph:unittest3.gcno
+        -:    0:Data:unittest3.gcda
+        -:    0:Runs:2
+        -:    0:Programs:1
+        -:    1:/* -----------------------------------------------------------------------
+        -:    2: * Demonstration of how to write unit tests for dominion-base
+        -:    3: * Include the following lines in your makefile:
+        -:    4: *
+        -:    5: * unittest3: unittest3.c dominion.o rngs.o
+        -:    6: *      gcc -o unittest3 -g  unittest3.c dominion.o rngs.o $(CFLAGS)
+        -:    7: * -----------------------------------------------------------------------
+        -:    8: */
+        -:    9:
+        -:   10:#include "dominion.h"
+        -:   11:#include "dominion_helpers.h"
+        -:   12:#include <string.h>
+        -:   13:#include <stdio.h>
+        -:   14:#include <assert.h>
+        -:   15:#include "rngs.h"
+        -:   16:
+        -:   17:// set NOISY_TEST to 0 to remove printfs from output
+        -:   18:#define NOISY_TEST 1
+        -:   19:
+        2:   20:int main() {
+        -:   21:    int i;
+        2:   22:    int seed = 1000;
+        2:   23:    int numPlayer = 2;
+        -:   24:    int p, r, handCount;
+        2:   25:    int k[10] = {adventurer, council_room, feast, gardens, mine
+        -:   26:               , remodel, smithy, village, baron, great_hall};
+        -:   27:    struct gameState Before;
+        -:   28:    struct gameState After;
+        -:   29:
+        -:   30:    int response;
+        -:   31:
+        2:   32:    int sameFlag = 0;
+        2:   33:    int differentFlag = 0;
+        -:   34:
+        -:   35:
+        2:   36:    printf ("TESTING shuffle():\n");
+        6:   37:    for (p = 0; p < numPlayer; p++)
+        -:   38:    {
+        -:   39:
+        -:   40:#if (NOISY_TEST == 1)
+        4:   41:	    printf("Test Shuffle With Empty Deck\n");
+        -:   42:#endif
+        4:   43:	    memset(&Before, 23, sizeof(struct gameState));   // clear the game states
+        4:   44:	    memset(&After, 23, sizeof(struct gameState));   // clear the game states
+        4:   45:	    r = initializeGame(numPlayer, k, seed, &Before); // initialize a new game
+        4:   46:	    r = initializeGame(numPlayer, k, seed, &After); // initialize a new game
+        4:   47:	    After.handCount[p] = handCount;                 // set the number of cards on hand
+        -:   48:
+        4:   49:	    After.deckCount[p] = 0;
+        -:   50:
+        -:   51:
+        4:   52:	    response = shuffle(p, &After);
+        -:   53:
+        4:   54:	    assert(response == -1);
+        -:   55:
+        4:   56:	    After.deckCount[p] = Before.deckCount[p];		// Reset Deck Count
+        -:   57:    }
+        -:   58:
+        -:   59:#if (NOISY_TEST == 1)
+        2:   60:    printf("Compare Deck Positions Before and After\n"); 
+        -:   61:#endif
+        -:   62:
+        2:   63:    shuffle(0, &After);
+        2:   64:    shuffle(0, &After);
+        -:   65:
+       12:   66:    for (i = 0; i < After.deckCount[0]; i++) {
+        -:   67:
+       10:   68:	    if (After.deck[0][i] == Before.deck[0][i]) {
+        2:   69:		    sameFlag += 1;
+        -:   70:	    }
+        -:   71:	    
+        -:   72:	    else {
+        8:   73:		    differentFlag += 1;
+        -:   74:	    }
+        -:   75:    }
+        -:   76:    
+        2:   77:    assert(differentFlag > 0);
+        -:   78:    
+        2:   79:    printf("All tests passed!\n");
+        -:   80:
+        2:   81:    return 0;
+        -:   82:}

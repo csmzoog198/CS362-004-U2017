@@ -1,0 +1,46 @@
+        -:    0:Source:unittest1.c
+        -:    0:Graph:unittest1.gcno
+        -:    0:Data:unittest1.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:/* -----------------------------------------------------------------------
+        -:    2: * Demonstration of how to write unit tests for dominion-base
+        -:    3: * Include the following lines in your makefile:
+        -:    4: *
+        -:    5: * unittest1: unittest1.c dominion.o rngs.o
+        -:    6: *      gcc -o unittest1 -g  unittest1.c dominion.o rngs.o $(CFLAGS)
+        -:    7: * -----------------------------------------------------------------------
+        -:    8: */
+        -:    9:
+        -:   10:#include "dominion.h"
+        -:   11:#include "dominion_helpers.h"
+        -:   12:#include <string.h>
+        -:   13:#include <stdio.h>
+        -:   14:#include <assert.h>
+        -:   15:#include "rngs.h"
+        -:   16:
+        -:   17:// set NOISY_TEST to 0 to remove printfs from output
+        -:   18:#define NOISY_TEST 1
+        -:   19:
+        1:   20:int main() {
+        -:   21:    int i;
+        -:   22:    int cost;
+        -:   23:
+        -:   24:    // array of all cards
+        1:   25:    int cards[27] = {curse, estate, duchy, province, copper, silver, gold, adventurer, council_room, feast, gardens, mine, remodel, smithy, village, baron, great_hall, minion, steward, tribute, ambassador, cutpurse, embargo, outpost, salvager, sea_hag, treasure_map};
+        1:   26:    int costs[27] = {0, 2, 5, 8, 0, 3, 6, 6, 5, 4, 4, 5, 4, 4, 3, 4, 3, 5, 3, 5, 3, 4, 2, 5, 4, 4, 4};
+        -:   27:
+        1:   28:    printf ("TESTING getCost():\n");
+        -:   29:    
+        -:   30:#if (NOISY_TEST == 1)
+       28:   31:    for (i = 0; i < 27; i++) {
+       27:   32:	    printf("Testing card %d with cost %d.\n", cards[i], costs[i]);
+       27:   33:	    cost = getCost(cards[i]);
+       27:   34:	    assert(costs[i] == cost);
+        -:   35:    }
+        -:   36:#endif
+        -:   37:
+        1:   38:    printf("All tests passed!\n");
+        -:   39:
+        1:   40:    return 0;
+        -:   41:}

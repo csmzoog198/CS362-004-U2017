@@ -1,0 +1,217 @@
+        -:    0:Source:unittest2.c
+        -:    0:Graph:unittest2.gcno
+        -:    0:Data:unittest2.gcda
+        -:    0:Runs:4
+        -:    0:Programs:1
+        -:    1:/* -----------------------------------------------------------------------
+        -:    2: * Demonstration of how to write unit tests for dominion-base
+        -:    3: * Include the following lines in your makefile:
+        -:    4: *
+        -:    5: * unittest2: unittest2.c dominion.o rngs.o
+        -:    6: *      gcc -o unittest2 -g  unittest2.c dominion.o rngs.o $(CFLAGS)
+        -:    7: * -----------------------------------------------------------------------
+        -:    8: */
+        -:    9:
+        -:   10:#include "dominion.h"
+        -:   11:#include "dominion_helpers.h"
+        -:   12:#include <string.h>
+        -:   13:#include <stdio.h>
+        -:   14:#include <assert.h>
+        -:   15:#include "rngs.h"
+        -:   16:
+        -:   17: // set NOISY_TEST to 0 to remove printfs from output
+        -:   18:#define NOISY_TEST 1
+        -:   19:
+        4:   20:int main() {
+        -:   21:	int i;
+        -:   22:	int j;
+        -:   23:
+        4:   24:	int curseFlag = 0;
+        4:   25:	int provinceFlag = 0;
+        4:   26:	int treasureFlag = 0;
+        4:   27:	int nonsenseFlag = 0;
+        4:   28:	int bugFlag = 0;
+        4:   29:	int duplicateFlag = 0;
+        4:   30:	int testFlag = 0;
+        -:   31:
+        4:   32:	int* randArray1 = malloc(10 * sizeof(int));
+        4:   33:	int* randArray2 = malloc(10 * sizeof(int));
+        4:   34:	int* randArray3 = malloc(10 * sizeof(int));
+        4:   35:	int* randArray4 = malloc(10 * sizeof(int));
+        -:   36:
+        4:   37:	int* usedNumbs = malloc(5 * sizeof(int));
+        -:   38:
+        4:   39:	int* arrayReturned1 = malloc(10 * sizeof(int));
+        4:   40:	int* arrayReturned2 = malloc(10 * sizeof(int));
+        4:   41:	int* arrayReturned3 = malloc(10 * sizeof(int));
+        4:   42:	int* arrayReturned4 = malloc(10 * sizeof(int));
+        -:   43:
+        -:   44:
+       44:   45:	for (i = 0; i < 10; i++) {
+       40:   46:		randArray1[i] = i;
+        -:   47:	}
+        -:   48:
+       44:   49:	for (i = 0; i < 10; i++) {
+       40:   50:		randArray2[i] = i + 10;
+        -:   51:	}
+        -:   52:
+       44:   53:	for (i = 0; i < 10; i++) {
+       40:   54:		randArray3[i] = (i + 20) % 27;
+        -:   55:	}
+        -:   56:
+       44:   57:	for (i = 0; i < 10; i++) {
+       40:   58:		randArray4[i] = i % 5;
+        -:   59:	}
+        -:   60:
+        4:   61:	printf("TESTING kingdomCards():\n");
+        -:   62:
+        -:   63:#if (NOISY_TEST == 1)
+        4:   64:	printf("Test if KingdomCards() Only Accepts Valid Cards\n");
+        -:   65:#endif
+        4:   66:	arrayReturned1 = kingdomCards(randArray1[0], randArray1[1], randArray1[2], randArray1[3], randArray1[4], randArray1[5], randArray1[6], randArray1[7], randArray1[8], randArray1[9]);
+       44:   67:	for (i = 0; i < 10; i++) {
+       40:   68:		if (arrayReturned1[i] == 0) {
+        4:   69:			curseFlag = 1;
+        -:   70:		}
+       36:   71:		else if (arrayReturned1[i] > 0 && arrayReturned1[i] < 4) {
+       12:   72:			provinceFlag = 1;
+        -:   73:		}
+        -:   74:
+       24:   75:		else if (arrayReturned1[i] > 4 && arrayReturned1[i] < 7) {
+        8:   76:			treasureFlag = 1;
+        -:   77:		}
+        -:   78:
+       16:   79:		else if (arrayReturned1[i] > 0 || arrayReturned1[i] < 26) {
+       16:   80:			nonsenseFlag = 1;
+        -:   81:		}
+        -:   82:	}
+        -:   83:
+        4:   84:	if (curseFlag == 1) {
+        4:   85:		bugFlag = 1;
+        4:   86:		printf("BUG: KingdomCards() accepts Curse Cards\n");
+        -:   87:	}
+        -:   88:
+        4:   89:	if (provinceFlag == 1) {
+        4:   90:		bugFlag = 1;
+        4:   91:		printf("BUG: KingdomCards() accepts Territory Cards\n");
+        -:   92:	}
+        -:   93:
+        4:   94:	if (treasureFlag == 1) {
+        4:   95:		bugFlag = 1;
+        4:   96:		printf("BUG: KingdomCards() accepts Treasure Cards\n");
+        -:   97:	}
+        -:   98:
+        4:   99:	if (curseFlag == 1) {
+        4:  100:		bugFlag = 1;
+        4:  101:		printf("BUG: KingdomCards() accepts Curse Cards\n");
+        -:  102:	}
+        -:  103:
+        4:  104:	if (bugFlag == 0) {
+    #####:  105:		printf("Input Test Passed - KingdomCards() Only Accepts Valid Input\n");
+        -:  106:	}
+        -:  107:
+        -:  108:	else if (bugFlag == 1) {
+        -:  109:		testFlag == 1;
+        -:  110:	}
+        -:  111:
+        4:  112:	bugFlag = 0;		// Reset Bug Flag
+        -:  113:
+        -:  114:#if (NOISY_TEST == 1)
+        4:  115:	printf("Test if KingdomCards() Places Cards At Correct Location\n");
+        -:  116:#endif
+        4:  117:	arrayReturned1 = kingdomCards(randArray1[0], randArray1[1], randArray1[2], randArray1[3], randArray1[4], randArray1[5], randArray1[6], randArray1[7], randArray1[8], randArray1[9]);
+        4:  118:	arrayReturned2 = kingdomCards(randArray2[0], randArray2[1], randArray2[2], randArray2[3], randArray2[4], randArray2[5], randArray2[6], randArray2[7], randArray2[8], randArray2[9]);
+        4:  119:	arrayReturned3 = kingdomCards(randArray3[0], randArray3[1], randArray3[2], randArray3[3], randArray3[4], randArray3[5], randArray3[6], randArray3[7], randArray3[8], randArray3[9]);
+       44:  120:	for (i = 0; i < 10; i++) {
+       40:  121:		if (arrayReturned1[i] != randArray1[i]) {
+    #####:  122:			bugFlag = 1;
+        -:  123:		}
+        -:  124:
+       40:  125:		if (arrayReturned2[i] != randArray2[i]) {
+    #####:  126:			bugFlag = 1;
+        -:  127:		}
+        -:  128:
+       40:  129:		if (arrayReturned3[i] != randArray3[i]) {
+    #####:  130:			bugFlag = 1;
+        -:  131:		}
+        -:  132:	}
+        -:  133:
+        4:  134:	if (bugFlag == 0) {
+        4:  135:		printf("Input Test Passed - KingdomCards() Places Cards At Correct Locations\n");
+        -:  136:	}
+        -:  137:
+    #####:  138:	else if (bugFlag == 1) {
+    #####:  139:		testFlag = 1;
+        -:  140:	}
+        -:  141:
+        4:  142:	bugFlag = 0;
+        -:  143:
+        -:  144:#if (NOISY_TEST == 1)
+        4:  145:	printf("Test if KingdomCards() Accepts Duplicate Cards\n");
+        -:  146:#endif
+        4:  147:	arrayReturned4 = kingdomCards(randArray4[0], randArray4[1], randArray4[2], randArray4[3], randArray4[4], randArray4[5], randArray4[6], randArray4[7], randArray4[8], randArray4[9]);
+       44:  148:	for (i = 0; i < 10; i++) {
+       40:  149:		duplicateFlag = 0;
+      240:  150:		for (j = 0; j < 5; j++) {
+      200:  151:			if (arrayReturned4[i] == usedNumbs[j]) {
+       40:  152:				duplicateFlag = 1;
+        -:  153:			}
+        -:  154:		}
+        -:  155:
+       40:  156:		if (duplicateFlag = 1) {
+       40:  157:			bugFlag = 1;
+        -:  158:		}
+        -:  159:
+       40:  160:		if (duplicateFlag == 0) {
+    #####:  161:			usedNumbs[i % 5] = arrayReturned4[i];
+        -:  162:		}
+        -:  163:	}
+        -:  164:
+        4:  165:	if (bugFlag == 0) {
+    #####:  166:		printf("Input Test Passed - KingdomCards() Does Not Accept Duplicate Cards\n");
+        -:  167:	}
+        -:  168:
+        4:  169:	else if (bugFlag == 1) {
+        4:  170:		testFlag = 1;
+        4:  171:		printf("BUG: KingdomCards() Accepts Duplicate Cards\n");
+        -:  172:	}
+        -:  173:
+        4:  174:	bugFlag = 0;
+        -:  175:
+        -:  176:#if (NOISY_TEST == 1)
+        4:  177:	printf("Test if KingdomCards() Returns Correct Array\n");
+        -:  178:#endif
+        4:  179:	arrayReturned1 = kingdomCards(randArray1[0], randArray1[1], randArray1[2], randArray1[3], randArray1[4], randArray1[5], randArray1[6], randArray1[7], randArray1[8], randArray1[9]);
+        4:  180:	arrayReturned2 = kingdomCards(randArray2[0], randArray2[1], randArray2[2], randArray2[3], randArray2[4], randArray2[5], randArray2[6], randArray2[7], randArray2[8], randArray2[9]);
+        4:  181:	arrayReturned3 = kingdomCards(randArray3[0], randArray3[1], randArray3[2], randArray3[3], randArray3[4], randArray3[5], randArray3[6], randArray3[7], randArray3[8], randArray3[9]);
+       44:  182:	for (i = 0; i < 10; i++) {
+       40:  183:		if (arrayReturned1[i] != randArray1[i]) {
+    #####:  184:			bugFlag = 1;
+        -:  185:		}
+        -:  186:
+       40:  187:		if (arrayReturned2[i] != randArray2[i]) {
+    #####:  188:			bugFlag = 1;
+        -:  189:		}
+        -:  190:
+       40:  191:		if (arrayReturned3[i] != randArray3[i]) {
+    #####:  192:			bugFlag = 1;
+        -:  193:		}
+        -:  194:	}
+        -:  195:
+        4:  196:	if (bugFlag == 0) {
+        4:  197:		printf("Input Test Passed - KingdomCards() Returns Correct Array\n");
+        -:  198:	}
+        -:  199:
+    #####:  200:	else if (bugFlag == 1) {
+    #####:  201:		printf("BUG: KingdomCards() Returns Incorrect Array\n");
+        -:  202:	}
+        -:  203:
+        4:  204:	if (testFlag == 0) {
+    #####:  205:		printf("All tests passed!\n");
+    #####:  206:		return 0;
+        -:  207:	}
+        4:  208:	else if (testFlag == 1) {
+        4:  209:		printf("BUG: SOME TESTS FAILED!\n");
+        4:  210:		return -1;
+        -:  211:	}
+    #####:  212:}

@@ -1,0 +1,80 @@
+        -:    0:Source:unittest4.c
+        -:    0:Graph:unittest4.gcno
+        -:    0:Data:unittest4.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:/* -----------------------------------------------------------------------
+        -:    2: * Demonstration of how to write unit tests for dominion-base
+        -:    3: * Include the following lines in your makefile:
+        -:    4: *
+        -:    5: * unittest4: unittest4.c dominion.o rngs.o
+        -:    6: *      gcc -o unittest4 -g  unittest4.c dominion.o rngs.o $(CFLAGS)
+        -:    7: * -----------------------------------------------------------------------
+        -:    8: */
+        -:    9:
+        -:   10:#include "dominion.h"
+        -:   11:#include "dominion_helpers.h"
+        -:   12:#include <string.h>
+        -:   13:#include <stdio.h>
+        -:   14:#include <assert.h>
+        -:   15:#include "rngs.h"
+        -:   16:
+        -:   17:// set NOISY_TEST to 0 to remove printfs from output
+        -:   18:#define NOISY_TEST 1
+        -:   19:
+        1:   20:int main() {
+        -:   21:	int i;
+        1:   22:    int seed = 1000;
+        1:   23:    int numPlayer = 2;
+        -:   24:    int r;
+        1:   25:    int k[10] = {adventurer, council_room, feast, gardens, mine
+        -:   26:               , remodel, smithy, village, baron, great_hall};
+        -:   27:    struct gameState G;
+        -:   28:  
+        -:   29:    int response;
+        -:   30:
+        1:   31:    printf ("TESTING isGameOver():\n");
+        -:   32:    
+        -:   33:#if (NOISY_TEST == 1)
+        1:   34:    printf("Test IsGameOver() Returns True with > 2 Supply Piles Empty\n");
+        -:   35:#endif
+        -:   36:
+        1:   37:    memset(&G, 23, sizeof(struct gameState));   // clear the game state
+        1:   38:    r = initializeGame(numPlayer, k, seed, &G); // initialize a new game
+        -:   39:    
+       28:   40:    for (i = 0; i < 27; i++) {
+       27:   41:	    G.supplyCount[i] = 10;
+        -:   42:    }
+        -:   43:
+        4:   44:    for (i = 0; i < 3; i++) {
+        3:   45:	    G.supplyCount[i] = 0;
+        -:   46:    }
+        -:   47:    
+        1:   48:    response = isGameOver(&G);
+        1:   49:    assert(response == 1);
+        -:   50:
+        -:   51:#if (NOISY_TEST == 1)
+        1:   52:    printf("Test IsGameOver() Returns True with Province Piles Empty\n");
+        -:   53:#endif
+        1:   54:    response = 0;
+        1:   55:    G.supplyCount[province] = 0;
+        -:   56:
+        1:   57:    response = isGameOver(&G);
+        1:   58:    assert(response == 1);
+        -:   59:
+        -:   60:#if (NOISY_TEST == 1)
+        1:   61:    printf("Test IsGameOver() Returns False with < 3 Piles Empty\n");
+        -:   62:#endif
+        1:   63:    response = 0;
+        1:   64:    G.supplyCount[curse] = 1;
+        1:   65:    G.supplyCount[province] = 1;
+        1:   66:    G.supplyCount[duchy] = 0;
+        1:   67:    G.supplyCount[estate] = 0;
+        -:   68:
+        1:   69:    response = isGameOver(&G);
+        1:   70:    assert(response == 0);
+        -:   71:    
+        1:   72:    printf("All tests passed!\n");
+        -:   73:
+        1:   74:    return 0;
+        -:   75:}
