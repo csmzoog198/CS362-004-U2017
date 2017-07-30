@@ -200,7 +200,6 @@ int initializeGame(int numPlayers, int kingdomCards[10], int randomSeed,
 
 int shuffle(int player, struct gameState *state) {
  
-
   int newDeck[MAX_DECK];
   int newDeckPos = 0;
   int card;
@@ -650,13 +649,18 @@ void adventurerFunction(struct gameState *state){
 	int cardDrawn;
 	int temphand[MAX_HAND];
 	while(drawntreasure<2){
+
         	if (state->deckCount[currentPlayer] <1){//if the deck is empty we need to shuffle discard and add to deck
           		shuffle(currentPlayer, state);
+			z = 0;
         	}
         	drawCard(currentPlayer, state);
         	cardDrawn = state->hand[currentPlayer][state->handCount[currentPlayer]-1];//top card of hand is most recently drawn card.
-        	if (cardDrawn == copper || cardDrawn == silver || cardDrawn == gold)
+
+
+        	if (cardDrawn == copper || cardDrawn == silver || cardDrawn == gold){
           		drawntreasure++;
+		}
         	else{
           		temphand[z]=cardDrawn;
           		state->handCount[currentPlayer]--; //this should just remove the top card (the most recently drawn one).
@@ -730,9 +734,6 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
   int tributeRevealedCards[2] = {-1, -1};
   int temphand[MAX_HAND];// moved above the if statement
-  int drawntreasure=0;
-  int cardDrawn;
-  int z = 0;// this is the counter for the temp hand
   if (nextPlayer > (state->numPlayers - 1)){
     nextPlayer = 0;
   }
